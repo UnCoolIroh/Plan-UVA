@@ -100,9 +100,7 @@ Implemented visual feedback mechanisms for better user interaction.
 
 How to Use
 
-Clone the repository:
-
-git clone https://github.com/your-username/project-management-app.git
+Clone the repository
 
 Set up the environment:
 

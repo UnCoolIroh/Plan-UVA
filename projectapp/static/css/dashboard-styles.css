@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common User Dashboard</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- Custom CSS styles -->
+    <link rel="stylesheet" href="{% static 'css/dashboard-styles.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #232D4B;
+        }
+        .welcome-header {
+            color: #E57200;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #E57200;
+            color: white;
+            font-weight: bold;
+        }
+        .list-group-item {
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .top-image {
+            max-width: 30%;
+            height: auto;
+        }
+        .user-info {
+            text-align: right;
+            padding-right: 30px;
+        }
+        @media (max-width: 767.98px) {
+            .user-info {
+                text-align: center;
+                padding-right: 0;
+            }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</head>
+<body>
+    <!-- Top Section -->
+    <div class="container-fluid bg-white py-3 shadow-sm mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center">
+                <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="PlanUVA Logo" class="top-image">
+            </div>
+            <div class="col-md-6 user-info">
+                <h1 class="welcome-header">Welcome, {{ project_user.username }}</h1>
+                <p class="mb-1">Email: {{ project_user.email }}</p>
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Owned Projects Section -->
+                <div class="card mb-4">
+                    <div class="card-header">Owned Projects</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for project in owned_projects %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    <a href="{% url 'project_group' project.id %}">{{ project.name }}</a> - {{ project.description }}
+                                </span>
+                                <form method="post" action="{% url 'delete_project' project.id %}" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Delete this project">Delete</button>
+                                </form>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">No owned projects.</li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'create_project' %}" class="btn btn-primary btn-sm mt-3">Create New Project</a>
+                    </div>
+                </div>
+
+                <!-- Other Projects Section -->
+                <div class="card mb-4">
+                    <div class="card-header">Other Projects</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for group in project_groups %}
+                            {% if group.owner != project_user %}
+                            <li class="list-group-item">
+                                <a href="{% url 'project_group' group.id %}">{{ group.name }}</a> - {{ group.description }}
+                            </li>
+                            {% endif %}
+                            {% empty %}
+                            <li class="list-group-item">You are not a member of any projects.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Available Projects Section -->
+                <div class="card mb-4">
+                    <div class="card-header">Available Projects to Join</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for item in groups_with_status %}
+                            {% with group=item.group %}
+                            <li class="list-group-item">
+                                {{ group.name }} - {{ group.description }}
+                                {% if item.has_requested %}
+                                <p>Your request is pending approval.</p>
+                                {% else %}
+                                <form method="post" action="{% url 'request_to_join_group' group.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm">Request to Join Group</button>
+                                </form>
+                                {% endif %}
+                            </li>
+                            {% endwith %}
+                            {% empty %}
+                            <li class="list-group-item">No available projects.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+                <!-- Conversations Section -->
+                <div class="card mb-4">
+                    <div class="card-header">Conversations</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for conversation in conversations %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>
+                                    <a href="{% url 'conversation' conversation.id %}">
+                                        Conversation with 
+                                        {% for participant in conversation.participants.all %}
+                                        {% if participant != project_user %}
+                                        {{ participant.username }}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </a>
+                                </span>
+                                <form method="post" action="{% url 'delete_conversation' conversation.id %}" onsubmit="return confirm('Are you sure?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" data-toggle="tooltip" title="Delete this conversation">Delete</button>
+                                </form>
+                            </li>
+                            {% empty %}
+                            <li class="list-group-item">No conversations.</li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{% url 'create_conversation' %}" class="btn btn-primary btn-sm mt-3">Create New Conversation</a>
+                    </div>
+                </div>
+
+                <!-- Search Documents Section -->
+                <div class="card">
+                    <div class="card-header">Search Documents by Keyword</div>
+                    <div class="card-body">
+                        <form method="get" action="{% url 'search_documents_by_keyword' %}">
+                            <div class="form-group">
+                                <input type="text" name="q" class="form-control" placeholder="Search by keyword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

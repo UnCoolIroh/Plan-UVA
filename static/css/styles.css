@@ -1,0 +1,88 @@
+/* Style for corner images */
+.corner-image {
+    position: absolute;
+    width: 50px;  /* Adjust the size as needed */
+    height: auto;  /* Maintain the aspect ratio */
+    z-index: 100;  /* Ensure the image stays on top of the background */
+}
+
+.top-left {
+    top: 10px;
+    left: 10px;
+}
+
+.top-right {
+    top: 10px;
+    right: 10px;
+}
+
+/* Ensure the background image fully covers the entire screen */
+body {
+    background-image: url("../images/HomePage_Background_SWE_F24V2.jpg");
+    background-size: cover;  /* This ensures the image covers the screen while keeping the aspect ratio */
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 5vh;
+    box-sizing: border-box;
+}
+
+/* Container to center the content */
+.container {
+    background-color: transparent; /* Ensure the container has no background */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Outline box with orange border and no background */
+.outline-box {
+    border: 2px solid #FF7F00;  /* Orange outline */
+    padding: 40px;
+    border-radius: 10px;
+    color: #00204E;  /* Navy Blue text */
+    max-width: 600px;
+    margin: auto;
+    background-color: transparent; /* Ensure no grey background */
+}
+
+/* Change the color of the Google Login text */
+h1, p {
+    color: #00204E;  /* Navy Blue text */
+}
+
+/* Style the button using Bootstrap with custom color */
+.btn-primary {
+    background-color: #00204E;  /* Navy Blue */
+    border-color: #00204E;  /* Navy Blue */
+    color: white;
+    border: 2px solid #FF7F00;  /* Orange outline */
+    font-size: 1.5rem;
+    padding: 10px 30px;
+    border-radius: 5px;
+}
+
+.btn-primary:hover {
+    background-color: #cc6600;  /* Darken the button on hover */
+    border-color: #cc6600;
+}
+
+/* Adding some margin and padding with Bootstrap classes */
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.p-4 {
+    padding: 1.5rem;
+}
+
+.mt-5 {
+    margin-top: 3rem;
+}

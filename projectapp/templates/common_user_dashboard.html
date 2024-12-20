@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta tags for character encoding and viewport settings -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page title -->
+    <title>Common User Dashboard</title>
+    <!-- Load static files -->
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS styles -->
+    <link rel="stylesheet" href="{% static 'css/dashboard-styles.css' %}">
+    <!-- Inline CSS styles (Consider moving these styles to 'dashboard-styles.css') -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            color: #232D4B; /* UVA navy text */
+        }
+        .welcome-header {
+            color: #E57200; /* UVA orange */
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            margin-top: 55px;
+        }
+        .conversations-box {
+            border: 2px solid #E57200; /* Border color */
+            border-radius: 5px; /* Rounded corners */
+            background-color: #fff; /* White background */
+            padding: 15px; /* Inner spacing */
+            width: 100%; /* Full width */
+            margin-bottom: 20px; /* Space below */
+        }
+        .centered-content {
+            margin-bottom: 30px; /* Space below sections */
+        }
+        .main-container {
+            margin-top: 20px; /* Space above main content */
+            width: 100%; /* Full width */
+        }
+        .top-image {
+            max-width: 30%; /* Makes the image responsive within its column */
+            height: auto; /* Maintains aspect ratio */
+        }
+        /* Optional: Adjust the spacing and alignment for the top section */
+        .top-section {
+            margin-bottom: 20px; /* Space below the top section */
+            background-color: #f8f9fa; /* Match the body background */
+            margin-top: -55px; /* Vertical padding */
+        }
+        .user-info {
+            /* Adjust text alignment on different screen sizes */
+            text-align: right; /* Align text to the right */
+            padding-right: 30px; /* Add padding to the right side */
+        }
+        @media (max-width: 767.98px) {
+            .user-info {
+                text-align: center; /* Center text on small screens */
+                padding-right: 0; /* Remove right padding on small screens */
+            }
+            .top-section {
+                padding: 20px; /* Add horizontal padding on small screens */
+            }
+        }
+        .pending-request {
+            color: #FFC107; /* Bootstrap's warning color (amber) */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<!-- Top Section with Image and User Info -->
+<!-- Changed 'container' to 'container-fluid' to span full width -->
+<div class="container-fluid top-section">
+    <div class="row align-items-center">
+        <!-- Image Column -->
+        <div class="col-md-6 text-center">
+            <!-- Centered image/logo -->
+            <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="Top Image" class="top-image">
+        </div>
+        <!-- User Info Column -->
+        <div class="col-md-6 user-info">
+            <!-- Welcome message and user details -->
+            <h1 class="welcome-header">Welcome, {{ project_user.username }}</h1>
+            <p class="mt-3"><a href="{% url 'user_profile' %}" class="btn btn-secondary">My Profile</a></p>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main content area using Bootstrap grid -->
+<div class="container main-container">
+    <div class="row">
+        <!-- Left Column: Projects and Other Content -->
+        <div class="col-lg-8" id="left-column">
+            <!-- Your Owned Projects Section -->
+            <div class="centered-content" id="owned-projects-section">
+                <!-- Section header -->
+                <h2>Owned Projects</h2>
+                <!-- List of owned projects -->
+                <ul class="list-group">
+                    {% for project in owned_projects %}
+                    <li class="list-group-item">
+                        <!-- Link to project details -->
+                        <a href="{% url 'project_group' project.id %}">{{ project.name }}</a> - {{ project.description }}
+                        <!-- Delete project form -->
+                        <form method="post" action="{% url 'delete_project' project.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                            {% csrf_token %}
+                            <!-- Delete button -->
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </li>
+                    {% empty %}
+                    <!-- Message when no owned projects -->
+                    <li class="list-group-item">You do not own any projects.</li>
+                    {% endfor %}
+                </ul>
+                <!-- Button to create new project -->
+                <p><a href="{% url 'create_project' %}" class="btn btn-primary btn-sm mt-2">Create New Project</a></p>
+            </div>
+
+            <!-- Projects You're a Member Of Section -->
+            <div class="centered-content" id="other-projects-section">
+                <!-- Section header -->
+                <h2>Other Projects</h2>
+                <!-- List of other projects the user is a member of -->
+                <ul class="list-group">
+                    {% for group in project_groups %}
+                    {% if group.owner != project_user %}
+                    <li class="list-group-item">
+                        <!-- Link to project details -->
+                        <a href="{% url 'project_group' group.id %}">{{ group.name }}</a> - {{ group.description }}
+                    </li>
+                    {% endif %}
+                    {% empty %}
+                    <!-- Message when user is not a member of any projects -->
+                    <li class="list-group-item">You are not a member of any projects.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Available Projects to Join Section -->
+            <div class="centered-content" id="available-projects-section">
+                <!-- Section header -->
+                <h2>Available Projects to Join</h2>
+                <!-- List of available projects -->
+                <ul class="list-group">
+                    {% for item in groups_with_status %}
+                    {% with group=item.group %}
+                    <li class="list-group-item">
+                        <!-- Project name and description -->
+                        <p><strong>{{ group.name }}</strong></p>
+                        <p> Owner: {{ group.owner.username }}</p>
+                        <p>{{ group.description }}</p>
+                        {% if item.has_requested %}
+                        <!-- Message if request to join is pending -->
+                        <p class="pending-request">Your request is pending approval.</p>
+                        {% else %}
+                        <!-- Form to request to join the project -->
+                        <form method="post" action="{% url 'request_to_join_group' group.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">Request to Join Group</button>
+                        </form>
+                        {% endif %}
+                    </li>
+                    {% endwith %}
+                    {% empty %}
+                    <!-- Message when no available projects -->
+                    <li class="list-group-item">No available projects.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column: Conversations and Search -->
+        <div class="col-lg-4" id="right-column">
+            <!-- Conversations Section -->
+            <div class="conversations-box" id="conversations-section">
+                <!-- Section header -->
+                <h2>Conversations</h2>
+                <!-- List of conversations -->
+                <ul class="list-group">
+                    {% for conversation in conversations %}
+                    <li class="list-group-item">
+                        <!-- Link to conversation -->
+                        <a href="{% url 'conversation' conversation.id %}">
+                            Conversation with
+                            {% for participant in conversation.participants.all %}
+                            {% if participant != project_user %}
+                            {{ participant.username }}
+                            {% endif %}
+                            {% endfor %}
+                        </a>
+                        <!-- Delete conversation form -->
+                        <form method="post" action="{% url 'delete_conversation' conversation.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this conversation?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </li>
+                    {% empty %}
+                    <!-- Message when no conversations -->
+                    <li class="list-group-item">You have no conversations.</li>
+                    {% endfor %}
+                </ul>
+                <!-- Button to create new conversation -->
+                <p><a href="{% url 'create_conversation' %}" class="btn btn-primary btn-sm mt-2">Create New Conversation</a></p>
+            </div>
+
+            <!-- Search Documents Section -->
+            <div class="conversations-box" id="search-section">
+                <!-- Section header -->
+                <h2>Search Documents by Keyword</h2>
+                <!-- Search form -->
+                <form method="get" action="{% url 'search_documents_by_keyword' %}">
+                    <div class="form-group">
+                        <!-- Search input field -->
+                        <input type="text" name="q" class="form-control" placeholder="Search by keyword" required>
+                    </div>
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-block">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple footer text at the bottom -->
+<p class="text-center text-muted small mt-4">
+    This system is a class project. It is not monitored, and no real information should be submitted.
+</p>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

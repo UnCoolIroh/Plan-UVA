@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Details - {{ project.name }}</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Existing Styles */
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .container {
+            flex: 1;
+        }
+        .card {
+            margin: 30px auto;
+            padding: 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card .card-body {
+            padding: 20px;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+        }
+
+        .list-group-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 15px;
+            border: none;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .message-text {
+            margin-top: 5px;
+        }
+
+        .message-attachment {
+            margin-top: 10px;
+        }
+
+        .message-attachment a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .members-list, .documents-list {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .members-list li, .documents-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .members-list li:last-child, .documents-list li:last-child {
+            border-bottom: none;
+        }
+
+        .document-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .no-content {
+            color: #6c757d;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+        }
+
+        .file-preview img, .file-preview iframe, .file-preview embed {
+            max-width: 100%;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .file-preview iframe {
+            height: 500px;
+        }
+
+        .file-preview embed {
+            height: 500px;
+        }
+
+        .file-preview img {
+            height: auto;
+        }
+
+        .progress-container {
+            position: relative;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(45deg, #343a40, #495057);
+            color: #f8f9fa;
+        }
+        footer .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        footer small {
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <!-- Project Overview -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">{{ project.name }}</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Owner:</strong> {{ project.owner.username }}</p>
+            <p><strong>Description:</strong> {{ project.description }}</p>
+        </div>
+    </div>
+
+    <!-- Members Section -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Members</h2>
+        </div>
+        <div class="card-body">
+            <ul class="members-list">
+                {% for member in project.members.all %}
+                <li>{{ member.username }}</li>
+                {% empty %}
+                <li class="no-content">No members.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Messages</h2>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+            <ul class="list-group">
+                {% for message in messages %}
+                <li class="list-group-item">
+                    <div class="message-header">
+                        <strong>{{ message.sender.username }}</strong>
+                        <small class="text-muted">{{ message.timestamp|date:"M d, Y g:i A" }}</small>
+                    </div>
+                    <p class="message-text">{{ message.text }}</p>
+                    {% if message.document %}
+                    <div class="message-attachment">
+                        <strong>File attached:</strong>
+                        <a href="{{ message.document.generate_s3_url }}" download>{{ message.document.file_name }}</a>
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-content">No messages in this project.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Documents Section -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Documents</h2>
+        </div>
+        <div class="card-body">
+            {% if documents %}
+            <ul class="documents-list">
+                {% for document in documents %}
+                <li class="document-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ document.file_name }}</strong>
+                            <br>
+                            <small class="text-muted">
+                                Uploaded by {{ document.user.username }} on {{ document.uploaded_time|date:"M d, Y g:i A" }}
+                            </small>
+                        </div>
+                        <div class="document-actions">
+                            <a href="{{ document.generate_s3_url }}" download class="btn btn-sm btn-success">Download</a>
+                            <a href="{% url 'pma_admin_delete_file' document.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </div>
+                    <!-- File Preview -->
+                    <div class="file-preview">
+                        {% if document.file_extension|lower in "jpg jpeg png" %}
+                        <img src="{{ document.preview_url }}" alt="{{ document.file_name }}" class="img-fluid">
+                        {% elif document.file_extension|lower == "pdf" %}
+                        <embed src="{{ document.preview_url }}" type="application/pdf">
+                        {% elif document.file_extension|lower == "txt" %}
+                        <iframe src="{{ document.preview_url }}"></iframe>
+                        {% else %}
+                        <p>Preview not available for this file type.</p>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-content">No documents in this project.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="text-center mt-4">
+        <a href="{% url 'pma_admin_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

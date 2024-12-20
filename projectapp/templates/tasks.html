@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks for {{ project_group.name }}</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/tasks-styles.css' %}">
+    <style>
+        /* Flexbox Layout for Sticky Footer */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+            color: #232D4B;
+            font-family: Arial, sans-serif;
+        }
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .main-content {
+            flex: 1;
+        }
+
+        /* Existing Styles */
+        h1, h2 {
+            color: #E57200;
+        }
+        .btn-primary {
+            background-color: #E57200;
+            border-color: #E57200;
+        }
+        .btn-primary:hover {
+            background-color: #C46000;
+            border-color: #C46000;
+        }
+        #taskForm {
+            border: 2px solid #E57200;
+            border-radius: 5px;
+            background-color: white;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #E57200;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .task-buttons {
+            margin-top: 10px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(45deg, #343a40, #495057);
+            color: #f8f9fa;
+        }
+        footer .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        footer small {
+            font-size: 0.95rem;
+        }
+    </style>
+    <script>
+        function toggleForm() {
+            const form = document.querySelector('#taskForm form');
+            const button = document.getElementById('createTaskButton');
+            const taskFormDiv = document.getElementById('taskForm');
+
+            if (form && form.checkValidity()) {
+                if (taskFormDiv.style.display === "none") {
+                    taskFormDiv.style.display = "block";
+                    button.style.display = "none";
+                } else {
+                    taskFormDiv.style.display = "none";
+                    button.style.display = "inline-block";
+                }
+            } else {
+                taskFormDiv.style.display = "block";
+                button.style.display = "inline-block";
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="main-content">
+        <div class="container mt-5">
+            <a href="{% url 'project_group' project_group.id %}" class="btn btn-outline-secondary mb-3">Back to Project</a>
+            <h1>Task List for {{ project_group.name }}</h1>
+            <button id="createTaskButton" class="btn btn-primary mb-3" onclick="toggleForm()">Create A New Task</button>
+
+            {% if not tried_submit %}
+            <div id="taskForm" style="display: none;">
+                <h2>Create a New Task</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary" onclick="toggleForm()">Create Task</button>
+                </form>
+            </div>
+            {% else %}
+            <div id="taskForm" style="display: block;">
+                <h2>Create a New Task</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary" onclick="toggleForm()">Create Task</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <ul>
+                {% for task in tasks %}
+                <li>
+                    <h2>{{ task.name }}</h2>
+                    <p><strong>Description:</strong> {{ task.description }}</p>
+                    <p><strong>Status:</strong> {% if task.is_complete %} Complete {% else %} In Progress {% endif %}</p>
+                    <p><strong>Weight:</strong> {{ task.weight }}</p>
+                    <p><strong>Assigned Members:</strong></p>
+                    <ul>
+                        {% for member in task.assigned_users.all %}
+                        <li>{{ member.username }}</li>
+                        {% empty %}
+                        <li>No members assigned.</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="task-buttons">
+                        {% if not task.is_complete %}
+                        <form method="post" action="{% url 'mark_complete' task.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Mark Complete</button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="{% url 'delete_task' task.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                {% empty %}
+                <p>No tasks found.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

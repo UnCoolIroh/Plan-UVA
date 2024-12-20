@@ -1,0 +1,111 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% load static %}
+
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block extra_head %}
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+{% endblock extra_head %}
+
+{% block body %}
+    <style>
+        /* Updated styling to match the dashboard */
+        body {
+            background-color: #edeeee; /* Light gray background */
+            font-family: Arial, sans-serif;
+            color: #232D4B; /* UVA navy text */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column; /* Stack elements vertically */
+        }
+        .top-image {
+            max-width: 30%; /* Matches the dashboard's image size */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 10px; /* Space below the image */
+            background-color: #f8f9fa; /* Match your page background color */
+            mix-blend-mode: multiply; 
+            margin-top: -350px; /* Align with the top */
+        }
+        .logo-text {
+            font-size: 2rem; /* Small subtitle text */
+            color: #c08237; /* Navy color for text */
+            margin-bottom: 10px; /* Space below the subtitle */
+            margin-top: -100px;
+            font-family: "Georgia", serif;
+        }
+        .container {
+            background-color: #ffffff; /* White background */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Slightly narrower container */
+            text-align: center;
+        }
+        h2 {
+            color: #2d2473; /* Dark navy color */
+            margin-bottom: 20px; /* Add spacing below the header */
+        }
+        .btn-primary {
+            background-color: #E57200; /* UVA orange */
+            border-color: #E57200;
+        }
+        .btn-primary:hover {
+            background-color: #cf5e00; /* Darker shade on hover */
+            border-color: #cf5e00;
+        }
+        p {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        a {
+            color: #E57200; /* Link color matches the theme */
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <!-- Add the top image -->
+    <div class="text-center">
+        <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="PlanUVA Logo" class="top-image">
+        <div class="logo-text">A new way to plan your UVA projects</div>
+    </div>
+
+    <!-- Login form container -->
+    <div class="container">
+        <h2>{% trans "Sign In" %}</h2>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+            <p>
+                {% blocktranslate %}If you have not created an account yet, then please <a href="{{ signup_url }}">sign up</a> first.{% endblocktranslate %}
+            </p>
+
+            {% url 'account_login' as login_url %}
+            <form method="post" action="{{ login_url }}" class="login-form">
+                {% csrf_token %}
+                
+                <!-- Render the login form -->
+                {{ form.as_p }}
+                
+                {{ redirect_field }}
+
+                <button type="submit" class="btn btn-primary btn-block">{% trans "Sign In" %}</button>
+            </form>
+        {% endif %}
+    </div>
+{% endblock body %}
+
+{% block extra_body %}
+    {{ block.super }}
+    {% if PASSKEY_LOGIN_ENABLED %}
+        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+    {% endif %}
+{% endblock %}

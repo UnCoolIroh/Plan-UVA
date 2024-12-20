@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Join Requests - {{ group.name }}</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .request-actions form {
+            display: inline;
+        }
+        .request-actions form button {
+            margin-right: 5px;
+        }
+
+        .centered-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .requests-list {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .orange-border {
+            border: 2px solid orange !important;
+        }
+
+        /* Sticky footer layout */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Footer styling */
+        footer {
+            background: linear-gradient(45deg, #343a40, #495057);
+            color: #f8f9fa;
+        }
+        footer .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        footer small {
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div class="content-wrapper">
+    <div class="container mt-5 centered-container">
+        <h1 class="mb-4 text-center">Manage Join Requests for <span class="text-primary">{{ group.name }}</span></h1>
+
+        {% if join_requests %}
+        <div class="card mb-4 orange-border">
+            <div class="card-body">
+                <ul class="list-group requests-list">
+                    {% for request in join_requests %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center border-0">
+                        <div>
+                            <strong>{{ request.user.username }}</strong> requested to join on
+                            <span class="text-muted">{{ request.timestamp|date:"M d, Y g:i A" }}</span>
+                        </div>
+                        <div class="request-actions">
+                            <form method="post" action="{% url 'approve_join_request' request.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form method="post" action="{% url 'reject_join_request' request.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No pending join requests.</p>
+        {% endif %}
+
+        <p><a href="{% url 'project_group' group.id %}" class="btn btn-secondary">Back to Group</a></p>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+
+<!-- Bootstrap JS (Optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

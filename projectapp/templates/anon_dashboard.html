@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Anonymous Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard-styles.css' %}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #232D4B;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh; /* Ensure the body takes at least the full viewport height */
+            display: flex;
+            flex-direction: column; /* Stack children vertically */
+        }
+        .welcome-header {
+            color: #E57200;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            margin-top: 55px;
+        }
+        .conversations-box {
+            border: 2px solid #E57200;
+            border-radius: 5px;
+            background-color: #fff;
+            padding: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .centered-content {
+            margin-bottom: 30px;
+        }
+        .main-container {
+            margin-top: 20px;
+            width: 100%;
+            flex: 1; /* Allow main container to grow and push footer down */
+        }
+        .top-image {
+            max-width: 30%;
+            height: auto;
+        }
+        .top-section {
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            margin-top: -55px;
+        }
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Simple Footer Styles */
+        footer {
+            background-color: #f8f9fa; /* Match the body background */
+            color: #232D4B; /* UVA navy text */
+            text-align: center; /* Center the text */
+            padding: 10px 0; /* Vertical padding */
+        }
+        footer small {
+            font-size: 0.9rem;
+        }
+    </style>
+    <script>
+        function showLoginModal(feature) {
+            const modal = document.getElementById("loginModal");
+            const modalText = document.getElementById("modalText");
+            modalText.innerHTML = "You need to be signed in to access " + feature + ".";
+            modal.style.display = "block";
+        }
+        function closeModal() {
+            const modal = document.getElementById("loginModal");
+            modal.style.display = "none";
+        }
+    </script>
+</head>
+<body>
+<!-- Modal for login alert -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p id="modalText"></p>
+        <a href="{% url 'home' %}" class="login-button">Login</a>
+    </div>
+</div>
+
+<!-- Top Section with Image and User Info -->
+<div class="container-fluid top-section">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-center">
+            <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="Top Image" class="top-image">
+        </div>
+        <div class="col-md-6 user-info text-right">
+            <h1 class="welcome-header">Welcome, Guest</h1>
+            <p class="mb-1">Please log in to access full features.</p>
+            <a href="{% url 'home' %}" class="btn btn-outline-danger btn-sm">Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="container main-container">
+    <div class="row">
+        <!-- Left Column: Projects and Other Content -->
+        <div class="col-lg-8" id="left-column">
+            <div class="centered-content" id="owned-projects-section">
+                <h2>Owned Projects</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">You do not own any projects.</li>
+                </ul>
+                <p><button onclick="showLoginModal('creating a new project')" class="btn btn-primary btn-sm mt-2">Create New Project</button></p>
+            </div>
+
+            <div class="centered-content" id="available-projects-section">
+                <h2>Available Projects to Join</h2>
+                <ul class="list-group">
+                    {% for group in all_project_groups %}
+                    <li class="list-group-item">
+                        <p><strong>{{ group.name }}</strong></p>
+                        <p> Owner: {{ group.owner.username }}</p>
+                        <p>{{ group.description }}</p>
+                        <button onclick="showLoginModal('joining this project')" class="btn btn-primary btn-sm">Request to Join Group</button>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No available projects.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Column: Conversations and Search -->
+        <div class="col-lg-4" id="right-column">
+            <div class="conversations-box" id="conversations-section">
+                <h2>Conversations</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">No conversations available.</li>
+                </ul>
+                <p><button onclick="showLoginModal('creating a new conversation')" class="btn btn-primary btn-sm mt-2">Create New Conversation</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Footer at the Bottom -->
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

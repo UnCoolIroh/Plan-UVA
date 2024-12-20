@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanUVA Home</title>
+
+    <!-- Load static files -->
+    {% load static %}
+    {% load socialaccount %}
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- Optional: Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        /* Ensure the html and body take up the full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Body styling using Flexbox */
+        body {
+            display: flex; /* Enable Flexbox */
+            flex-direction: column; /* Stack elements vertically */
+            background-color: #f8f9fa; /* Light gray background */
+            font-family: Arial, sans-serif;
+            color: #232D4B; /* UVA navy text */
+        }
+
+        /* Main content area to take up available space */
+        .main-content {
+            flex: 1; /* Grow to fill the space between header and footer */
+            display: flex; /* Enable Flexbox */
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center horizontally */
+            justify-content: center; /* Center vertically */
+            padding: 20px; /* Optional padding */
+        }
+
+        /* Top section with logo and subtitle */
+        .top-section {
+            text-align: center;
+            margin-bottom: 20px; /* Space between the logo and the box */
+        }
+
+        .top-image {
+            max-width: 30%; /* Matches login screen image size */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 10px; /* Adjust spacing below the logo */
+        }
+
+        .logo-text {
+            font-size: 1.5rem; /* Subtitle font size */
+            color: #c08237; /* UVA orange */
+            font-family: "Georgia", serif; /* Georgia font for subtitle */
+        }
+
+        /* Main content container with outline */
+        .outline-box {
+            background-color: #ffffff; /* White background for content box */
+            padding: 30px 20px; /* Space inside the box */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            text-align: center; /* Center the text */
+            max-width: 400px; /* Restrict width */
+            width: 100%; /* Full width on smaller screens */
+        }
+
+        h1 {
+            color: #232D4B; /* Navy text */
+            font-size: 1.8rem; /* Adjust font size */
+            margin-bottom: 15px; /* Space below header */
+        }
+
+        p {
+            color: #6c757d; /* Muted gray for subtitle */
+            font-size: 1rem; /* Text size for subtitle */
+            margin-bottom: 20px; /* Space below text */
+        }
+
+        .btn-container {
+            display: flex; /* Enable Flexbox */
+            flex-direction: column; /* Stack buttons vertically */
+            gap: 20px; /* Space between buttons */
+            margin-top: 20px; /* Add some space above buttons */
+        }
+
+        .btn-primary {
+            background-color: #E57200; /* UVA orange button */
+            border-color: #E57200; /* Matching border */
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #cf5e00; /* Darker orange on hover */
+            border-color: #cf5e00;
+            color: white;
+        }
+
+        .btn-light-blue {
+            background-color: #cce5ff; /* Subtle light blue background */
+            border-color: #cce5ff; /* Matching border */
+            color: #004085; /* Dark blue text for contrast */
+        }
+
+        .btn-light-blue:hover {
+            background-color: #b8daff; /* Slightly darker light blue on hover */
+            border-color: #b8daff;
+            color: #002752; /* Darker blue text on hover */
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(45deg, #343a40, #495057); /* Gradient background */
+            color: #f8f9fa; /* Light text color */
+        }
+
+        footer .container {
+            display: flex; /* Enable Flexbox */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 20px 0; /* Vertical padding */
+        }
+
+        footer small {
+            font-size: 0.95rem; /* Small font size */
+        }
+    </style>
+</head>
+<body>
+<!-- Main Content Area -->
+<div class="main-content">
+    <!-- Top section with logo and subtitle -->
+    <div class="top-section">
+        <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="PlanUVA Logo" class="top-image">
+        <div class="logo-text">A new way to plan your UVA projects</div>
+    </div>
+
+    <!-- Main content container with outline -->
+    <div class="container text-center outline-box">
+        <h1>Welcome to PlanUVA</h1>
+        <p>Project planner for UVA students</p>
+        <!-- Button container -->
+        <div class="btn-container">
+            <a class="btn btn-primary btn-lg" href="{% provider_login_url 'google' %}?next=/">
+                <i class="bi bi-google me-2"></i> Login with Google
+            </a>
+            <a class="btn btn-light-blue btn-lg" href="{% url 'anon_dashboard' %}">
+                Go to Anonymous Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

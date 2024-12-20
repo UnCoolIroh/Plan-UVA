@@ -1,0 +1,15 @@
+asgiref
+Django
+sqlparse
+gunicorn
+django-heroku
+dj-database-url
+django-allauth
+requests
+PyJWT
+cryptography
+whitenoise
+django-environ
+django-storages
+django-debug-toolbar
+boto3

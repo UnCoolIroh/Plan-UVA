@@ -1,0 +1,173 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% load allauth account %}
+{% load static %}
+
+{% block head_title %}
+    {% trans "Sign Up" %}
+{% endblock head_title %}
+
+{% block extra_head %}
+    <!-- Add Bootstrap CSS link -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+{% endblock extra_head %}
+
+{% block body %}
+    <style>
+        /* Body styling */
+        body {
+            background-color: #f8f9fa; 
+            font-family: Arial, sans-serif;
+            color: #232d4b; /* UVA dark blue */
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex; /* Flexbox for alignment */
+            flex-direction: column; /* Stack logo and container vertically */
+            justify-content: space-between; /* Space between logo and container */
+            align-items: center; /* Center horizontally */
+        }
+
+        /* Logo section styling */
+        .top-section {
+            text-align: center;
+             /* Space from the top of the screen */
+        }
+
+        .top-image {
+            max-width: 30%;
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 10px; /* Spacing below the logo */
+            margin-top: -10px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            color: #c08237; /* UVA orange */
+            font-family: "Georgia", serif;
+            margin-bottom: 20px; /* Space below the subtitle */
+        }
+
+        /* Centered signup container */
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* White with slight transparency */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px; /* Restrict width */
+            text-align: center; /* Center content */
+        }
+
+        /* Styling for form elements */
+        form {
+            margin-top: 20px;
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background-color: #e57200; /* UVA orange */
+            border-color: #e57200;
+            width: 100%; /* Full width */
+        }
+
+        .btn-primary:hover {
+            background-color: #cf5e00; /* Darker orange on hover */
+            border-color: #cf5e00;
+        }
+
+        /* Styling for headings and text */
+        h2 {
+            font-size: 28px;
+            color: #f47b20; /* UVA orange */
+        }
+
+        p {
+            font-size: 16px;
+            color: #232d4b; /* UVA dark blue */
+        }
+
+        /* Separator */
+        hr {
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }
+    </style>
+
+    <!-- Logo section -->
+    <div class="top-section">
+        <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="PlanUVA Logo" class="top-image">
+        <div class="logo-text">A new way to plan your UVA projects</div>
+    </div>
+
+    <!-- Centered signup container -->
+    <div class="container">
+        <h2>{% trans "Sign Up" %}</h2>
+
+        <p>
+            {% blocktranslate %}If you already have an account, please <a href="{{ login_url }}">sign in</a>.{% endblocktranslate %}
+        </p>
+
+        {% if not SOCIALACCOUNT_ONLY %}
+            {% url 'account_signup' as signup_url %}
+            <form method="post" action="{{ signup_url }}">
+                {% csrf_token %}
+
+                <!-- Username Field with Error Messages -->
+                <div class="form-group">
+                    {{ form.username.label_tag }} <!-- Label for username -->
+                    {{ form.username }} <!-- Username field -->
+                    {% if form.username.errors %}
+                        <div class="text-danger">
+                            {{ form.username.errors.0 }} <!-- Display the first error message -->
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Email Field with Error Messages -->
+                <div class="form-group">
+                    {{ form.email.label_tag }} <!-- Label for email -->
+                    {{ form.email }} <!-- Email field -->
+                    {% if form.email.errors %}
+                        <div class="text-danger">
+                            {{ form.email.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field with Error Messages -->
+                <div class="form-group">
+                    {{ form.password1.label_tag }} <!-- Label for password -->
+                    {{ form.password1 }} <!-- Password field -->
+                    {% if form.password1.errors %}
+                        <div class="text-danger">
+                            {{ form.password1.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Confirm Password Field with Error Messages -->
+                <div class="form-group">
+                    {{ form.password2.label_tag }} <!-- Label for password confirmation -->
+                    {{ form.password2 }} <!-- Confirm password field -->
+                    {% if form.password2.errors %}
+                        <div class="text-danger">
+                            {{ form.password2.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sign Up Button -->
+                <button type="submit" class="btn btn-primary btn-block">{% trans "Sign Up" %}</button>
+                {{ redirect_field }}
+            </form>
+        {% endif %}
+    </div>
+
+{% endblock body %}
+
+{% block extra_body %}
+    {{ block.super }}
+    {% if PASSKEY_LOGIN_ENABLED %}
+        {% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_signup" %}
+    {% endif %}
+{% endblock extra_body %}

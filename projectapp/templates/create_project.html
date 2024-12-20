@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Project</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height:100%;
+            margin:0;
+            padding:0;
+        }
+        body {
+            display:flex;
+            flex-direction:column;
+            background-color: #f8f9fa;
+            color: #232D4B;
+        }
+        .main-content {
+            flex:1;
+        }
+        h1 {
+            color: #E57200;
+        }
+        .form-container {
+            margin: 50px auto;
+            max-width: 600px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .btn-primary {
+            background-color: #E57200;
+            border-color: #E57200;
+        }
+        .btn-primary:hover {
+            background-color: #C95C00;
+        }
+        a {
+            color: #232D4B;
+        }
+        a:hover {
+            text-decoration: none;
+        }
+
+        footer {
+            background: linear-gradient(45deg, #343a40, #495057);
+            color:#f8f9fa;
+        }
+        footer .container {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px 0;
+        }
+        footer small {
+            font-size:0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="main-content">
+    <div class="container">
+        <div class="form-container">
+            <h1 class="text-center mb-4">Create New Project</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">Create Project</button>
+            </form>
+            <p class="text-center mt-4">
+                <a href="{% url 'common_user_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </p>
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

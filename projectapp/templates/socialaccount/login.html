@@ -1,0 +1,166 @@
+{% extends "socialaccount/base_entrance.html" %}
+
+{% block body %}
+{% load i18n %}
+{% load allauth %}
+{% load static %}
+
+<style>
+    /* Body styling */
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+        font-family: Arial, sans-serif;
+        color: #232d4b; /* UVA dark blue */
+        margin: 0;
+        padding: 0;
+        min-height: 100vh; /* Ensure the body takes at least full viewport height */
+        display: flex; /* Flexbox for layout */
+        flex-direction: column; /* Stack elements vertically */
+    }
+
+    /* Main content wrapper */
+    .main-content {
+        flex: 1; /* Allow main-content to grow and fill available space */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center horizontally */
+        justify-content: center; /* Center vertically */
+    }
+
+    /* Top section */
+    .top-section {
+        text-align: center;
+        margin-top: 20px; /* Space from top of the page */
+    }
+
+    .top-image {
+        max-width: 30%;
+        height: auto; /* Maintain aspect ratio */
+        margin-bottom: 10px; /* Spacing below the logo */
+        margin-top: -30px;
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+        color: #c08237; /* UVA orange */
+        font-family: "Georgia", serif;
+        margin-bottom: 30px; /* Space below subtitle */
+    }
+
+    /* Main container styling */
+    .main-container {
+        background-color: rgba(255, 255, 255, 0.95); /* White with slight transparency */
+        padding: 20px; /* Increased padding for better spacing */
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        text-align: center;
+        max-width: 500px;
+        width: 90%; /* Responsive width */
+    }
+
+    .login-options h1, .google-login h1 {
+        color: #f47b20; /* UVA orange */
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+
+    .login-options a {
+        display: block;
+        margin: 10px 0;
+        padding: 10px 20px;
+        color: #232d4b; /* UVA dark blue */
+        text-decoration: none;
+        border: 2px solid #232d4b;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .login-options a:hover {
+        background-color: #ffcc00; /* Orange hover */
+        color: white;
+    }
+
+    .or-text {
+        font-size: 1.5rem;
+        color: #232d4b;
+        margin: 20px 0;
+    }
+
+    .google-login button {
+        background-color: #232d4b; /* UVA dark blue */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .google-login button:hover {
+        background-color: #111744; /* Darker blue for hover */
+    }
+
+    /* Footer Styles */
+    footer {
+        background: linear-gradient(45deg, #343a40, #495057);
+        color: #f8f9fa;
+        width: 100%; /* Make footer span full width */
+    }
+
+    footer .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 0;
+    }
+
+    footer small {
+        font-size: 0.95rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+        .top-image {
+            max-width: 50%; /* Increase logo size on small screens */
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+        }
+
+        .main-container {
+            padding: 15px;
+        }
+    }
+</style>
+
+<!-- Main content wrapper -->
+<div class="main-content">
+    <!-- Top section with logo -->
+    <div class="top-section">
+        <img src="{% static 'images/PlanUVA_Logo.jpg' %}" alt="PlanUVA Logo" class="top-image">
+        <div class="logo-text">A new way to plan your UVA projects</div>
+    </div>
+
+    <!-- Main login container -->
+    <div class="main-container">
+        <!-- Google login -->
+        <div class="google-login">
+            <h1>Sign In Via Google</h1>
+            <p>You are about to sign in using a third-party account from Google.</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="button btn btn-primary">Continue</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <small>This system is a class project. It is not monitored, and no real information should be submitted.</small>
+    </div>
+</footer>
+
+{% endblock %}
